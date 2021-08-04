@@ -96,7 +96,7 @@ public class HomeController {
 			System.out.print("Até");
 	}
 
-	private static boolean verificaPais() {
+	public static boolean verificaPais() {
 		
 		return ClientesDAO.verificaTipoCliente("Pais");
 	}

@@ -2,6 +2,9 @@ package controller;
 
 import java.util.Scanner;
 
+import dao.ClientesDAO;
+import model.Clientes;
+
 public class BibliotecaController {
 
 	public static void main(String[] args) throws InterruptedException {
@@ -9,6 +12,7 @@ public class BibliotecaController {
 		Scanner input = new Scanner(System.in);
 		int opcao = 0;
 		char sair = 'N';
+		int cliente;
 
 		do {
 		System.out.print("\n ___________________________________ \n");
@@ -31,12 +35,26 @@ public class BibliotecaController {
 		
 		case 1:
 			System.out.print("\n ________|   Atualiza Alunos   |________ \n");
-			menuCliente("Alunos");
+			System.out.print("Se deseja voltar --> 0\n"
+					+ "Qual código do cliente?\n");
+			cliente = input.nextInt();
+			if(cliente != 0) {
+				if(verificaTipoClienteById("Alunos", cliente)) {					
+					menuCliente("Alunos", cliente);
+				}
+			}
 
 			break;
 		case 2:
 			System.out.print("\n ________|  Atualiza Pais   |________ \n");
-			menuCliente("Pais");
+			System.out.print("Se deseja voltar --> 0\n"
+					+ "Qual código do cliente?\n");
+			cliente = input.nextInt();
+			if(cliente != 0) {
+				if(verificaTipoClienteById("Pais", cliente)) {					
+					menuCliente("Pais", cliente);
+				}
+			}
 			break;
 		case 3:
 			System.out.print("\n ________|   Atualiza Livros   |________ \n");
@@ -56,10 +74,15 @@ public class BibliotecaController {
 		
 	}
 
-	public static void menuCliente(String TC) throws InterruptedException {
+	private static boolean verificaTipoClienteById(String tipoCliente, int id) {
+		
+		return ClientesDAO.verificaTipoClienteById(tipoCliente, id);
+	}
+
+	public static void menuCliente(String TC, int cliente) throws InterruptedException {
 		@SuppressWarnings("resource")
 		Scanner input = new Scanner(System.in);
-		
+				
 		String nome;
 		int idade;
 		Long telefone;
@@ -90,7 +113,7 @@ public class BibliotecaController {
 				next = true;
 			}
 		} while(next == false);
-		System.out.println(conferir + " " + update + "" + next);
+//		System.out.println(conferir + " " + update + " " + next);
 
 		if(conferir == 'S') {
 			System.out.print(
@@ -118,8 +141,19 @@ public class BibliotecaController {
 		
 		
 		if(update == 'S') {
-			//update
-			System.out.println("update");
+			Clientes c = new Clientes();
+			
+			c.setId(cliente);
+			c.setNome(nome);
+			c.setIdade(idade);
+			c.setTelefone(telefone);
+			c.setEndereco(endereco);
+			c.setTipoCliente(tipoCliente);
+			
+			if(ClientesDAO.updateClientes(c))
+				System.out.println("Sucesso");
+			else
+				System.out.println("Erro");
 		}
 
 		Thread.sleep(2000);

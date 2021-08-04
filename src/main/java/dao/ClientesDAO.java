@@ -67,11 +67,68 @@ public class ClientesDAO extends BaseDAO {
 	}
 	
     public static void main(String[] args) {
-    	Clientes c = new Clientes(4, "rosa", 35, 995612321L, "Avenida Dom João", "Pais", "senha");
+//    	Clientes c = new Clientes(4, "rosa", 35, 995612321L, "Avenida Dom João", "Pais", "senha");
     
-    	insertClientes(c);
+//    	System.out.println(updateClientes(c));
     }
     
+	public static boolean updateClientes(Clientes c) {
+		final String sql = "UPDATE clientes SET nome=?, idade=?, telefone=?, endereco=?, tipoCliente=? WHERE id=?";	
+		try
+			(
+				Connection conn = getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+			) 
+		{
+			System.out.println(c);
+			pstmt.setString(1, c.getNome());
+			pstmt.setInt(2, c.getIdade());
+			pstmt.setLong(3, c.getTelefone());
+			pstmt.setString(4, c.getEndereco());
+			pstmt.setString(5, c.getTipoCliente());
+			pstmt.setInt(6, c.getId());
+			int count = pstmt.executeUpdate();
+			return count > 0;
+
+		}  catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public static boolean verificaTipoClienteById(String tipoCliente, int id) {
+
+		final String sql = "Select * from clientes where tipoCliente = ? and id = ?";
+
+		try
+		(
+			Connection conn = getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+		)
+		{
+			pstmt.setString(1, tipoCliente);
+			pstmt.setInt(2, id);
+			ResultSet rs = pstmt.executeQuery();
+			//contagem de linhas
+			rs.last();
+			int rows = rs.getRow();
+			
+			Clientes e = new Clientes();
+	//		Clientes e = null;
+			if(rs.next()) {
+				e = resultsetToClientes(rs);
+			}
+	
+			rs.close();
+	
+			return rows > 0;
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	@SuppressWarnings("unused")
 	public static boolean verificaTipoCliente(String tipoCliente) {
 
