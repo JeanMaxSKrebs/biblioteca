@@ -56,7 +56,7 @@ public class ExemplaresDAO extends BaseDAO {
 	}
 	
 	public static boolean insertExemplar(Exemplares exemplar) {
-		final String sql = "INSERT INTO exemplares(nome, tipoExemplar, edicao, autor, editora, situacao) VALUES (?, ?, ?, ?, ?, ?)";	
+		final String sql = "INSERT INTO exemplares(nome, tipoExemplar, edicao, autor, editora, situacao) VALUES (?, ?, ?, ?, ?, 'Estoque')";	
 		try
 			(
 				Connection conn = getConnection();
@@ -80,7 +80,7 @@ public class ExemplaresDAO extends BaseDAO {
 	}
 	
 	public static boolean updateExemplar(Exemplares exemplar) {
-		final String sql = "UPDATE exemplares SET nome=?, tipoExemplar=?, edicao=?, autor=?, editora=?, situacao=? WHERE id=?";	
+		final String sql = "UPDATE exemplares SET nome=?, tipoExemplar=?, edicao=?, autor=?, editora=? WHERE id=?";	
 		try
 			(
 				Connection conn = getConnection();
@@ -93,8 +93,7 @@ public class ExemplaresDAO extends BaseDAO {
 			pstmt.setInt(3, exemplar.getEdicao());
 			pstmt.setString(4, exemplar.getAutor());
 			pstmt.setString(5, exemplar.getEditora());
-			pstmt.setString(6, exemplar.getSituacao());
-			pstmt.setInt(7, exemplar.getId());
+			pstmt.setInt(6, exemplar.getId());
 			int count = pstmt.executeUpdate();
 			return count > 0;
 
@@ -124,15 +123,16 @@ public class ExemplaresDAO extends BaseDAO {
 	}
 	
 	private static Exemplares resultsetToExemplares(ResultSet rs) throws SQLException {
-		Exemplares p = new Exemplares();
-		p.setId(rs.getInt("id"));
-		p.setNome(rs.getString("nome"));
-		p.setTipoExemplar(rs.getString("tipoExemplar"));
-		p.setEdicao(rs.getInt("edicao"));
-		p.setAutor(rs.getString("autor"));
-		p.setEditora(rs.getString("editora"));
+		Exemplares e = new Exemplares();
+		e.setId(rs.getInt("id"));
+		e.setNome(rs.getString("nome"));
+		e.setTipoExemplar(rs.getString("tipoExemplar"));
+		e.setEdicao(rs.getInt("edicao"));
+		e.setAutor(rs.getString("autor"));
+		e.setEditora(rs.getString("editora"));
+		e.setSituacao(rs.getString("situacao"));
 
-		return p;
+		return e;
 	}
 	
 	public static boolean updateVariavel(String nomeCampo, String novoRegistro, int id) {

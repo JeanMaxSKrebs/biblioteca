@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import dao.EmprestimoDAO;
 import dao.ExemplaresDAO;
 import model.Exemplares;
 
 public class ExemplaresController {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		
 		@SuppressWarnings("resource")
 		Scanner input = new Scanner(System.in);
 		int opcao = 0;
 		char sair = 'N';
 		int id;
+		int cliente;
 
 		do {
 		System.out.println("\n");
@@ -26,7 +28,9 @@ public class ExemplaresController {
 				+ "4 ------------------- Atualiza Único Registro\n"
 				+ "5 ------------------- Mostra Livros\n"
 				+ "6 ------------------- Informa Perdido\n"
-				+ "7 ------------------- Voltar\n"
+				+ "7 ------------------- Informa Devolução\n"
+				+ "8 ------------------- Verifica Emprestimos\n"
+				+ "9 ------------------- Voltar\n"
 
 				+ "\n"
 				+ "--> ");
@@ -38,13 +42,23 @@ public class ExemplaresController {
 		case 1:
 			System.out.print("\n ________|   Informa Retirada   |________ \n");
 			System.out.print("Se deseja voltar --> 0\n"
-					+ "Qual código do exemplar?\n");
-			id = input.nextInt();
-			if(id != 0) {
-				if(retiraLivro(id))
-					System.out.println("Sucesso");
-				else {
-					System.out.println("Erro");
+					+ "Qual código do cliente?\n");
+			cliente = input.nextInt();
+			if(cliente != 0) {
+				System.out.print("Se deseja voltar --> 0\n"
+						+ "Qual código do exemplar?\n");
+				id = input.nextInt();
+
+				if(id != 0) {
+					if(verificaEstoque(id)) {
+						if(retiraLivro(id, cliente))
+							System.out.println("Sucesso");
+						else {
+							System.out.println("Erro");
+						}
+					} else {
+						System.out.println("Sem Estoque");
+					}
 				}
 			}
 			break;
@@ -89,7 +103,6 @@ public class ExemplaresController {
 							+ "3 ------------------- Edicão\n"
 							+ "4 ------------------- Autor\n"
 							+ "5 ------------------- Editora\n"
-							+ "6 ------------------- Situação\n"
 							+ "\n"
 							+ "--> ");
 					opcaoAtt = input.nextInt();
@@ -121,6 +134,28 @@ public class ExemplaresController {
 				}
 			}
 			break;
+		case 7:
+			System.out.print("\n ________|   Informa Devolução   |________ \n");
+			System.out.print("Se deseja voltar --> 0\n"
+					+ "Qual código do exemplar?\n");
+			id = input.nextInt();
+			if(id != 0) {
+				if(informaLivroDevolucao(id))
+					System.out.println("Sucesso");
+				else {
+					System.out.println("Erro");
+				}
+			}
+			break;
+		case 8:
+			System.out.print("\n ________|   Verifica Emprestimos   |________ \n");
+			System.out.print("Se deseja voltar --> 0\n"
+					+ "Qual código do cliente?\n");
+			cliente = input.nextInt();
+			if(cliente != 0) {
+				System.out.println(verificaEmprestimo(cliente)+" empréstimo(s)");
+			}
+			break;
 		default:
 			if(opcao != 0) {
 				System.out.println("Deseja Voltar? S/N");
@@ -129,12 +164,19 @@ public class ExemplaresController {
 					opcao = 0;
 			}
 		}
+		Thread.sleep(2000);
 		} while(opcao != 0);
 		
 		System.out.print("Até");
 		
 	}
 	
+	private static int verificaEmprestimo(int cliente) {
+		
+		return EmprestimoDAO.countIdCliente(cliente);
+	
+	}
+
 	public static void mostraExemplares() {
 		List<Exemplares> listExemplares = new ArrayList<Exemplares>();
 		
@@ -154,12 +196,32 @@ public class ExemplaresController {
 		}
 	}
 	
+	public static boolean informaLivroDevolucao(int id) {
+		
+		if(ExemplaresDAO.softDeleteExemplar(id, "Estoque")
+			&& EmprestimoDAO.softDeleteEmprestimo(id, false)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	public static boolean informaLivroPerdido(int id) {
 		return ExemplaresDAO.softDeleteExemplar(id, "Perdido");
 	}
+
+	public static boolean verificaEstoque(int id) {
+		
+		return ExemplaresDAO.selectExemplarById(id).getSituacao().equals("Estoque");
+			
+	}
 	
-	public static boolean retiraLivro(int id) {
-		return ExemplaresDAO.softDeleteExemplar(id, "Retirado");
+	public static boolean retiraLivro(int id, int cliente) {
+
+		if(ExemplaresDAO.softDeleteExemplar(id, "Retirado")
+			&& EmprestimoDAO.insertEmprestimo(id, cliente)) {
+			return true;
+		}
+		return false;
 	}
 
 	public static boolean criaRegistro(Exemplares exemplar) {
@@ -181,7 +243,6 @@ public class ExemplaresController {
 		int edicao;
 		String autor;
 		String editora;
-		String situacao;
 		Exemplares exemplar = new Exemplares();
 		
 		System.out.print("Nome: ");
@@ -200,16 +261,12 @@ public class ExemplaresController {
 		System.out.print("Editora: ");
 		editora = input.nextLine();
 		System.out.println(editora);
-		System.out.print("Situação: ");
-		situacao = input.nextLine();
-		System.out.println(situacao);
 		
 		exemplar.setNome(nome);
 		exemplar.setTipoExemplar(tipoExemplar);
 		exemplar.setEdicao(edicao);
 		exemplar.setAutor(autor);
 		exemplar.setEditora(editora);
-		exemplar.setSituacao(situacao);
 		exemplar.setId(id);
 		 
 		return exemplar;
@@ -242,9 +299,6 @@ public class ExemplaresController {
 			case 5:
 				nomeCampo = "editora";
 				break;
-			case 6:
-				nomeCampo = "situacao";
-				break;
 				
 			default:
 				System.out.println("Em Andamento");
@@ -271,27 +325,29 @@ public class ExemplaresController {
 				confirmar = input.next().charAt(0);
 
 				break;
+				
 			case 2:
+				System.out.println("Deseja Alterar o Tipo de Cliente? S/N");
+				confirmar = input.next().charAt(0);
+
+				break;
+				
+			case 3:
 				System.out.println("Deseja Alterar o Edição? S/N");
 				confirmar = input.next().charAt(0);
 
 				break;
-			case 3:
+			case 4:
 				System.out.println("Deseja Alterar o Autor? S/N");
 				confirmar = input.next().charAt(0);
 				
 				break;
-			case 4:
+			case 5:
 				System.out.println("Deseja Alterar o Editora? S/N");
 				confirmar = input.next().charAt(0);
 				
 				break;
-			case 5:
-				System.out.println("Deseja Alterar o Situação? S/N");
-				confirmar = input.next().charAt(0);
 
-				break;
-				
 			default:
 				System.out.println("Em Andamento");
 
