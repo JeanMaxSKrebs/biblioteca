@@ -3,6 +3,7 @@ package controller;
 import java.util.Scanner;
 
 import dao.ClientesDAO;
+import model.Clientes;
 
 public class HomeController {
 	public static void main(String[] args) throws InterruptedException {
@@ -39,9 +40,10 @@ public class HomeController {
 				nome = input.nextLine();
 				System.out.print("Senha: ");
 				senha = input.nextLine();
-				
+				Clientes clienteLogado = new Clientes();
+				clienteLogado = retornaId(nome);
 				if(LoginController.main(nome, senha)) {
-						AlunosController.main(null);
+						AlunosController.main(clienteLogado);
 				} else {
 					System.out.println("Usuário inexistente");
 				}
@@ -49,7 +51,7 @@ public class HomeController {
 				break;
 			case 2:
 				System.out.print("\n ________|   Pais   |________ \n");
-				System.out.print("\n ________|   login: rosa senha: senha    |________ \n");
+				System.out.print("\n ________|   login: 1 senha: senha    |________ \n");
 				System.out.print("Nome: ");
 				nome = input.nextLine();
 				System.out.print("Senha: ");
@@ -94,6 +96,12 @@ public class HomeController {
 		} while(opcao != 0);
 			
 			System.out.print("Até");
+	}
+
+	private static Clientes retornaId(String nome) {
+
+		return ClientesDAO.selectClienteByNome(nome);
+
 	}
 
 	public static boolean verificaPais() {

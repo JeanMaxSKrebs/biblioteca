@@ -171,8 +171,7 @@ public class ExemplaresController {
 		
 	}
 	
-	private static int verificaEmprestimo(int cliente) {
-		
+	public static int verificaEmprestimo(int cliente) {
 		return EmprestimoDAO.countIdCliente(cliente);
 	
 	}

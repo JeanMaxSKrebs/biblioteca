@@ -96,6 +96,7 @@ public class ClientesDAO extends BaseDAO {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public static boolean verificaTipoClienteById(String tipoCliente, int id) {
 
 		final String sql = "Select * from clientes where tipoCliente = ? and id = ?";
@@ -162,6 +163,30 @@ public class ClientesDAO extends BaseDAO {
 		}
 	}
 	
+	public static Clientes selectClienteByNome(String nome) {
+		final String sql = "Select * from Clientes where nome = ?";
+		try
+			(
+				Connection conn = getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+			)
+		{
+			pstmt.setString(1, nome);
+			ResultSet rs = pstmt.executeQuery();
+
+			Clientes c = null;
+			if(rs.next()) {
+				c = resultsetToClientes(rs);
+			}
+			rs.close();
+			return c;
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	@SuppressWarnings("unused")
 	public static boolean verificaLogin(String nome, String senha) {
 		final String sql = "Select * from clientes where nome = ? and senha = ?";
@@ -190,6 +215,28 @@ public class ClientesDAO extends BaseDAO {
 			return rows > 0;
 			
 		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	public static boolean updateVariavel(String nomeCampo, String novoRegistro, int id) {
+		final String sql = "UPDATE clientes SET "+nomeCampo+"=? WHERE id=?";	
+//		final String sql = "UPDATE clientes SET ?=? WHERE id=?";	
+		try
+			(
+				Connection conn = getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+			) 
+		{
+//			pstmt.setString(1, nomeCampo);
+//			pstmt.setString(2, novoRegistro);
+//			pstmt.setInt(3, id);
+			pstmt.setString(1, novoRegistro);
+			pstmt.setInt(2, id);
+			int count = pstmt.executeUpdate();
+			return count > 0;
+
+		}  catch(SQLException e) {
 			e.printStackTrace();
 			return false;
 		}

@@ -157,6 +157,30 @@ public class ExemplaresDAO extends BaseDAO {
 			return false;
 		}
 	}
+	
+	public static List<Exemplares> selectRelacaoEmprestimo(int id) {
+		final String sql = "Select * from exemplares ex join emprestimo em on(ex.id = em.id_exemplar) where em.id_cliente = ? and em.situacao = true";	
+		try
+			(
+				Connection conn = getConnection();
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+			) 
+		{
+			pstmt.setInt(1, id);
+			
+			ResultSet rs = pstmt.executeQuery();
+			List<Exemplares> exemplares = new ArrayList<>();
+
+			while(rs.next()) {
+				exemplares.add(resultsetToExemplares(rs));
+			}
+			return exemplares;
+
+		}  catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
       
     
     public static void main(String[] args) {

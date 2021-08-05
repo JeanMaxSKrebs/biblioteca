@@ -35,7 +35,7 @@ public class EmprestimoDAO extends BaseDAO {
 	}
 	
 	public static boolean insertEmprestimo(int id_exemplar, int id_cliente) {
-		final String sql = "INSERT INTO emprestimo(dataEmprestimo, dataDevolucao, id_exemplar, id_cliente) VALUES (?, ?, ?, ?)";	
+		final String sql = "INSERT INTO emprestimo(dataEmprestimo, dataDevolucao, id_exemplar, id_cliente, situacao) VALUES (?, ?, ?, ?, ?)";	
 		try
 			(
 				Connection conn = getConnection();
@@ -46,6 +46,7 @@ public class EmprestimoDAO extends BaseDAO {
             pstmt.setDate(2, new Date(new java.util.Date().getTime()));
             pstmt.setInt(3, id_exemplar);
             pstmt.setInt(4, id_cliente);
+            pstmt.setBoolean(5, true);
 
 			int count = pstmt.executeUpdate();
 			return count > 0;
@@ -121,4 +122,7 @@ public class EmprestimoDAO extends BaseDAO {
 			return false;
 		}
 	}
+	
+
+
 }
